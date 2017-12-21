@@ -1,0 +1,110 @@
+\tikzstyle{line} = [draw]
+
+\begin{tabular}{c|c|c}
+  GFA & LFA & DFA \\
+\begin{tikzpicture}[->,>=stealth',auto,node distance=2cm,
+    thick,circnode/.style={circle,draw,inner sep=2,minimum size=1cm}]
+
+  \node[circnode] (h) {$h^n$};
+  \node[circnode] (ha) [above of=h] {$h^{n+1}$};
+  \node[circnode] (hb) [below of=h] {$h^{n-1}$};
+  \node[circnode] (e) [right of=h, node distance=2.5cm] {$e^n$};
+  \node[circnode] (ea) [above of=e] {$e^{n+1}$};
+  \node[circnode] (eb) [below of=e] {$e^{n-1}$};
+
+  \path[line] (hb) -- node [right] (Wb) {$W^n$} (h);
+  \path[line] (h) -- node [right] (Wa) {$W^{n+1}$} (ha);
+  \path[line] (ea) -- node [right] (Ba) {$B^{n+1}$} (e);
+  \path[line] (e) -- node [right] (Bb) {$B^n$} (eb);
+
+  \path[line] (h) -- node {$h'$} (e);
+  \path[line] (ha) -- node {$h'$} (ea);
+  \path[line] (hb) -- node {$h'$} (eb);
+  %% \path[line] (h) to [out=30,in=150] node {$h'$} (e);
+  \path[line] (ea) to (Wa);
+  \path[line] (e) to (Wb);
+
+  \node[] (h0) [below of=hb, node distance=10mm] {};
+  \node[] (h1) [above of=ha, node distance=10mm] {};
+  \path[line] (h0) -- (hb);
+  \path[line] (ha) -- (h1);
+  \node[] (e0) [below of=eb, node distance=10mm] {};
+  \node[] (e1) [above of=ea, node distance=10mm] {};
+  \path[line] (e1) -- (ea);
+  \path[line] (eb) -- (e0);
+  \node[] (h00) [right of=h0, node distance=10mm] {};
+  \path[line] (eb) -- (h00);
+\end{tikzpicture}
+&
+\begin{tikzpicture}[->,>=stealth',auto,node distance=2cm,
+    thick,circnode/.style={circle,draw,inner sep=2,minimum size=1cm}]
+
+  \node[circnode] (h) {$h^n$};
+  \node[circnode] (ha) [above of=h] {$h^{n+1}$};
+  \node[circnode] (hb) [below of=h] {$h^{n-1}$};
+  \node[circnode] (e) [right of=h, node distance=2.5cm] {$e^n$};
+  \node[circnode] (ea) [above of=e] {$e^{n+1}$};
+  \node[circnode] (eb) [below of=e] {$e^{n-1}$};
+
+  \path[line] (hb) -- node [right] (Wb) {$W^n$} (h);
+  \path[line] (h) -- node [right] (Wa) {$W^{n+1}$} (ha);
+  \path[line] (ea) -- node [right] (Ba) {$B^{n+1}$} (e);
+  \path[line] (e) -- node [right] (Bb) {$B^n$} (eb);
+  \path[line] (ea) to (Wa);
+  \path[line] (e) to (Wb);
+
+  \node[] (h0) [below of=hb, node distance=10mm] {};
+  \node[] (h1) [above of=ha, node distance=10mm] {};
+  \path[line] (h0) -- (hb);
+  \path[line] (ha) -- (h1);
+  \node[] (e0) [below of=eb, node distance=10mm] {};
+  \node[] (e1) [above of=ea, node distance=10mm] {};
+  \path[line] (e1) -- (ea);
+  \path[line] (eb) -- (e0);
+  \node[] (h00) [right of=h0, node distance=5mm] {};
+  \path[line] (eb) -- (h00);
+
+  \path[line] (h.east) .. controls +(right:7mm) and +(up:5mm)
+                        .. node [above right] {$h'$} (Wb.north);
+  \path[line] (ha.east) .. controls +(right:5mm) and +(up:5mm)
+                        .. node [above right] {$h'$} (Wa.north);
+  \path[line] (hb.east) .. controls +(right:5mm) and +(up:5mm)
+                        .. node [above right] {$h'$} (h00.north);
+\end{tikzpicture}
+&
+\begin{tikzpicture}[->,>=stealth',auto,node distance=2cm,
+    thick,circnode/.style={circle,draw,inner sep=2,minimum size=1cm}]
+
+  \node[circnode] (h) {$h^n$};
+  \node[circnode] (ha) [above of=h] {$h^{n+1}$};
+  \node[circnode] (hb) [below of=h] {$h^{n-1}$};
+  \node[circnode] (e) [right of=h, node distance=2.5cm] {$e^n$};
+  \node[circnode] (ea) [above of=e] {$e^{n+1}$};
+  \node[circnode] (eb) [below of=e] {$e^{n-1}$};
+  \node[circnode] (es) [right of=e, node distance=2cm] {$e^*$};
+
+  \path[line] (hb) -- node [right] (Wb) {$W^n$} (h);
+  \path[line] (h) -- node [right] (Wa) {$W^{n+1}$} (ha);
+  \path[line] (es) -- node [above right] (Bc) {$B^{n+2}$} (ea);
+  \path[line] (es) -- node [below] (Ba) {$B^{n+1}$} (e);
+  \path[line] (es) -- node [below right] (Bb) {$B^n$} (eb);
+
+  \node[] (h0) [below of=hb, node distance=10mm] {};
+  \node[] (h1) [above of=ha, node distance=10mm] {};
+  \path[line] (h0) -- (hb);
+  \path[line] (ha) -- (h1);
+  \node[] (h00) [right of=h0, node distance=5mm] {};
+
+  \path[line] (ea) to (Wa);
+  \path[line] (e) to (Wb);
+  \path[line] (eb) -- (h00);
+
+  \path[line] (h.east) .. controls +(right:7mm) and +(up:5mm)
+                        .. node [above right] {$h'$} (Wb.north);
+  \path[line] (ha.east) .. controls +(right:5mm) and +(up:5mm)
+                        .. node [above right] {$h'$} (Wa.north);
+  \path[line] (hb.east) .. controls +(right:5mm) and +(up:5mm)
+                        .. node [above right] {$h'$} (h00.north);
+\end{tikzpicture}
+
+\end{tabular}

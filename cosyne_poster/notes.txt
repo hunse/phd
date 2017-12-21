@@ -1,0 +1,56 @@
+Contributions
+- Using LIF instead of sigmoid
+  - Using different derivatives for LIF
+  - Show that liflinear works best, lifstep also works
+  - what about just clipping derivatives?
+- Using spiking neurons all the way through
+  - Look at having each error neuron only connected to a few forward neurons
+  - Feedback error connected randomly?
+  -
+
+- Intuition behind FA
+- Using semantic pointers for DTP
+
+- Look at classifiers at every layer
+
+- DTP
+  - Like FA at first, then gets better??
+
+- Optimal presentation time possibly dependent on length of whole simulation
+
+
+TODO:
+- Compare with backprop on simple problem!
+
+
+- Look at BCM
+  - BCM can't do as well as BP for functions that don't use all input dimensions
+  - Maybe just can BCM stuff for now
+
+- Look at DTP in spiking neurons
+  - Need wake and sleep phases
+  - Need two different things projected through back connections
+  - Guergiuev et al does this with compartmental neurons
+
+- Compare presentation time length (fewer, longer presentations or more shorter ones?)
+
+- Use masks on MNIST for better generalization?
+
+- Is FA better initialized with small weights? Unlike BP, back gradients don't
+  depend on forward magnitudes (this is a plus). Also, backwards pushing in
+  random directions, so initial forward weights shouldn't matter (could use zero weights).
+  NOT TRUE! But why?? Weights can be quite small
+
+- Try sparse feedback weights onto neurons
+
+- Reproduce "Mechanics of feedback alignment" figure from new Lillicrap paper.
+  How does W align with B.T if it's never had any contact with it?
+  Does this mean the first phase is necessary to have W0 be changed by B.T?
+  What is happening during first phase, as W0 is pushed "randomly" without
+  the error decreasing?
+
+- For MNIST, need to implement spiking softmax, or use one-hot targets
+
+- Determine relationship between FA neuron amplitudes, weight magnitudes,
+  learning rates, and feedback weight magnitudes. Can this even be done for
+  backprop? Maybe it's actually more straightforward with FA.

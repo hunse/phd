@@ -1,0 +1,9 @@
+*.dil
+*.npy
+*.npz
+
+*.pdf
+*.png
+
+old
+*/old

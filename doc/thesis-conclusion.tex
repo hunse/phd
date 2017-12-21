@@ -1,0 +1,467 @@
+\chapter{Conclusion}
+\chplabel{conclusion}
+
+I have described three different methods
+for constructing spiking neural networks:
+fixed-encoding methods, spiking deep neural networks trained with backpropagation,
+and spiking deep neural networks trained with Feedback Alignment.
+While the ultimate goal of all the methods
+is to provide insight into how the brain may solve
+the object classification problem,
+each method has its own unique benefits and limitations.
+This chapter outlines the key contributions of this thesis
+towards each of these three methods,
+as well as future work to be done both for the specific methods
+and to understand human object recognition as a whole.
+
+
+\section{Summary of contributions}
+
+\subsection{Fixed-encoding networks}
+
+The first portion of this thesis
+looks at spiking object classification in fixed-encoding networks.
+
+% Comparison of Gabor filter encoders with others
+This thesis proposes Gabor filters for fixed-encoding networks,
+demonstrating that a randomly generated basis of Gabor filters
+is a good encoding method for classifying MNIST images.
+They outperform the randomly generated weights
+typically used in fixed-encoding networks,
+as well as the Computed Input Weights and Constrained Difference weights
+approaches of data-driven encoder generation.
+This suggests that Gabor filters are a better basis for classification,
+despite being tuned to general image statistics,
+rather than the particular statistics of the MNIST dataset.
+
+% Characterization of the benefits of alternative loss functions for decoders
+I also characterize the benefits of alternative loss functions
+for solving for decoding weights in fixed-encoding networks.
+Alternative loss functions have not been well explored
+in these types of networks,
+with almost all works relying on squared loss.
+Squared loss works well for regression problems (such as those typically addressed by the NEF),
+but the results of \chp{nef} show that alternative loss functions
+(weighted squared loss, softmax loss, hinge loss)
+result in better performance on classification problems.
+While the weighted squared loss was previously introduced by \textcite{Toh2008},
+it has not caught on in the ELM community,
+who are the main group using fixed-encoding networks for classification.
+My results underscore the need for alternatives to squared loss.
+
+I run these fixed-encoding networks in spiking neurons,
+a step that is common in the NEF paradigm
+but that is not typically taken for object classification problems
+(which have largely been ignored by the NEF).
+The spiking networks perform almost as well their non-spiking counterparts,
+indicating that this conversion is possible,
+and allowing basic object classification components
+to be seamlessly integrated into NEF models.
+I also demonstrate that regularization is required for spiking networks
+when using squared loss,
+but is less essential with other loss functions,
+particularly softmax loss.
+
+
+\subsection{Spiking deep networks}
+
+The middle portion of this thesis examines methods
+to train spiking deep networks on more difficult object classification tasks,
+including the ImageNet dataset.
+
+% soft-LIF model
+The soft-LIF model---%
+a differentiable version of the LIF rate response curve---%
+is a novel way to train deep spiking networks with LIF neurons.
+It is both simple and efficient,
+allowing it to train the first deep spiking models
+on the ImageNet dataset \parencite{Hunsberger2016}.
+The idea behind it---%
+smoothing out the discontinuity of a neural model around the firing threshold---%
+is generalizable to other neural models,
+allowing deep networks to be trained with any neural model
+with a fixed rate response function.
+
+% Training with noise, and noise models
+I also introduce a novel approach to account for the variation
+caused by spiking neurons,
+by modelling this variation and training with
+stochastic variation (noise) with a similar distribution.
+The results show that training with noise (in the right amount) is beneficial,
+particularly when using no synaptic filters and shorter classification times.
+Doing so can improve the efficiency of spiking neural networks
+on neuromorphic hardware
+while maintaining similar levels of accuracy (\scn{spike-efficiency}).
+The method of characterizing spiking variation is also potentially applicable
+to other spiking networks,
+for example those developed using the NEF.
+
+
+\subsection{Biological learning}
+
+The final portion of this thesis
+brings biological plausibility
+into the training of deep spiking networks,
+specifically via the Feedback Alignment (FA) algorithm.
+
+% a better understanding of what FA is doing
+The first contribution of this thesis in this area
+is to provide a better understanding of how FA works.
+I examine a number of different variants of FA (GFA, LFA, and DFA),
+and find that they are all essentially doing the same thing.
+Including the gradient in the feedback pathway (as with GFA)
+does not contribute to the stability of the algorithm.
+FA also works with a number of different surrogate gradients for LIF neurons;
+it does not require the exact derivative of the nonlinearity to function.
+I introduce the derivative of an IF neuron with refractory period
+as a surrogate for the LIF derivative,
+and find that it works better than a step derivative function
+when used with FA.
+I also investigate the hypothesis that FA pushes neurons
+to be selective for particular classes.
+I find that there is correlation between a neuron's activity
+and its feedback weights in DFA,
+indicating that this hypothesis is correct.
+Yet the correlation is not perfect,
+suggesting that there are numerous factors at play,
+including the initial weights and which classes are more difficult to classify.
+
+% some limitations of FA
+Most works to date have focused on situations where FA performs similarly to BP;
+\scn{fa-limitations-results} begins to identify some of the limitations of FA.
+The results show that there are problems that BP can solve that FA cannot.
+This indicates that FA does not fully solve the credit assignment problem.
+%% This is partly due to the fact that FA requires class information
+%% to be available
+Interestingly, local BP (\ie/ BP without neuron derivatives in the feedback pathway)
+is also not able to solve this problem.
+This indicates that the inability of FA
+to include derivatives in the feedback pathway in a meaningful way
+contributes to its inability to fully solve credit assignment.
+
+% Further exploration of adaptive FA
+%% I further explore adaptive FA,
+%% and find that Hebbian and Oja adaptive FA
+%% can contribute to convergence if the feedback weights are too small,
+%% but not if they are properly adjusted.
+%% Symmetric adaptive FA is more beneficial,
+%% since the updates are identical to those for the feedforward weights
+%% and thus push the feedforward and feedback weights to align.
+%% This alignment leads to convergence rates on MNIST near that of BP.
+
+% novel spiking implementation of FA
+\scn{fa-spiking-results} presents a novel spiking implementation of FA.
+This spiking implementation addresses most of the problems
+with BP outlined in \scn{bp-problems},
+most notably some that have not been addressed by
+past spiking implementations.
+It uses population coding to transmit the feedback error
+using nonlinear neurons, addressing the linear feedback problem.
+It demonstrates that the timing problem does not prohibit learning
+as long as stimuli are shown for a sufficient length of time.
+It uses surrogate derivatives to allow the use spiking LIF neurons,
+improving on past models by using a more biologically-plausible neuron model,
+and demonstrating that surrogate derivatives can be used
+without a significant effect on performance.
+
+
+\section{Future work}
+
+This section outlines some avenues of future work
+that follow either directly from the work in one of the chapters,
+or more generally in order for neural models of object recognition
+to continue to become more biologically plausible and powerful (\scn{future-beyond}).
+
+
+\subsection{Fixed-encoding networks}
+
+% online implementations of loss functions
+The weighted squared loss, softmax loss, and hinge loss examined in \chp{nef}
+all showed an improvement over squared loss for classification.
+It remains unclear how neurons may implement such loss functions online.
+Weighted squared loss is likely the easiest to implement,
+since it still has a linear derivative.
+All that would be required is weighting the errors on the decoder learning
+based on the correct label of the current input.
+To implement softmax loss or hinge loss,
+neural mechanisms would be required
+for computing the nonlinear functions in their derivatives.
+Expanding these loss functions for online learning in neurons
+would have applications beyond fixed-encoding methods,
+to any online classification learning in neurons,
+including the biological learning methods examined in \chp{learning}.
+
+For fixed-encoding methods to be truly successful,
+they need to have success on more challenging datasets.
+To date, their main successes are on MNIST,
+with some success on CIFAR-10 \parencite{McDonnell2015a}.
+A likely criterion for this success is the extension to multilayer networks,
+with two or more hidden layers.
+This will require better techniques for constructing features
+beyond the first layer.
+The nature of deep features both in the brain and in ANNs
+are still poorly understood,
+which makes it difficult to manually construct these features
+for fixed-encoding networks.
+
+
+\subsection{Spiking deep networks}
+% --- spiking ANNs
+
+% Application to state-of-the-art network models
+Spiking ANNs can achieve similar performance to similar non-spiking ANNs---%
+even on challenging datasets like ImageNet---as shown in \chp{spike}.
+It has yet to be shown that spiking networks can match state-of-the-art
+performance on these datasets.
+The network on which I based my work in \chp{spike} \parencite{Krizhevsky2012}
+was close to the state-of-the-art when I began,
+but advances in recent years have far surpassed it.
+Achieving state-of-the-art results in spiking networks using my methods
+may be as straightforward as integrating them into the training procedure.
+The simplicity of some modern networks
+like the all-convolutional network of \textcite{Springenberg2015}
+could facilitate easy integration.
+
+% Lower firing rates in spiking networks
+Both the networks introduced in \chp{spike}
+and others that perform well on datasets like MNIST \parencite[\eg/][]{Diehl2015}
+have spike rates (80-180 Hz) considerably higher
+than those observed in cortical neurons ($\sim$10 Hz).
+Lowering firing rates would both increase the biological plausibility
+of the networks,
+and increase the potential benefits from implementing them on neuromorphic hardware,
+where energy use is often tied directly to neuron firing rates.
+Recent work by \textcite{Zambrano2017} moves in this direction,
+introducing networks with significantly lower firing rates
+($~\sim$10 Hz on many datasets).
+Yet, their networks actually require more spikes to classify each image,
+due to larger network sizes (see \tab{spike-sota-rates}).
+Future work is required to determine
+whether the number of spikes per can be reduced,
+while maintaining high levels of accuracy.
+
+% Implementation on neuromorphic hardware
+As of yet, my networks have not been tested on neuromorphic hardware.
+While this is theoretically straightforward,
+there are a number of technical hurdles to overcome,
+particularly when targeting analog neuromorphic hardware
+due to the variation between chips.
+These include developing detailed models of all the neurons on the hardware,
+then training the network for the specific chip in question.
+
+On some types of neuromorphic hardware,
+it is not possible to construct a static rate-response function
+for the neurons,
+if they include more complex dynamics such as adaptation.
+For this hardware, an approach that takes neuron dynamics into account
+might be required.
+As of yet, most methods for training spiking neural networks---%
+whether rate-based or spike-based---%
+are not able to account for such dynamics.
+
+
+\subsection{Biological learning}
+% --- biological learning
+% Better understanding of where feedback alignment fails.
+% - are true Credit assignment methods required?
+The results in \scn{fa-limitations-results}
+outline some of the limitations of FA as compared with BP,
+including the fact that FA does not truly solve the credit assignment problem.
+In that case, the limitations are only apparent on a constructed problem;
+it remains to be seen whether FA is limited on real-world problems,
+as compared with BP.
+So far, results from FA have been comparable with those of BP
+for fully connected networks on the MNIST dataset.
+\textcite{Nokland2016} applied FA to a convolutional network
+on the CIFAR-10 dataset,
+and found that it performed significantly worse than BP (see \scn{fa-bg} for details).
+Part of the problem may be that convolutional networks use tied weights,
+which results in many fewer parameters and thus make it more difficult
+for the random feedback basis employed by FA
+to function efficiently.\footnote{
+  A similar effect is seen with fixed-encoding networks.
+  They function almost as well as BP when using a large basis of random input weights
+  to cover the entire space of inputs,
+  but perform comparatively worse with only a small random basis.
+  The curse of dimensionality means that as the input dimensionality increases,
+  it becomes harder to tile the space with a random basis.}
+  %% This is related to the fact that a large number
+  %% of uniformly distributed random points
+  %% will cover a high-dimensional space almost as well
+  %% as if the points were uniformly tiled throughout the space,
+  %% but a few random points will do a comparatively worse job covering the space
+  %% as compared with the same points uniformly tiled.}
+Convolutional weights are also not biologically plausible,
+since the weights across different locations are exactly equal (tied),
+but they do make training deep networks more efficient due to fewer parameters.
+Future work should investigate whether FA is comparable to BP in a deep network
+without tied weights but with limited receptive fields (\ie/ locally connected layers),
+since these are most similar to the structure of visual cortex.
+If FA is able to achieve similar results to BP
+on more challenging datasets with such architectures,
+this may be evidence that FA is sufficient
+for the supervised learning problems faced by the brain.
+Otherwise, a learning method that fully solves the credit-assignment problem
+may be required.
+Adaptive FA is one such potential algorithm.
+By pushing the backwards weights to further align with the forward weights,
+not only could adaptive FA reduce the error due to misaligned feedback,
+but it could also allow FA to integrate neuron derivatives into the feedback pathway
+in a way that they contribute to credit assignment.
+Research is needed to test this hypothesis,
+as well as to identify adaptation methods for FA
+that are both effective and biologically plausible.
+
+% More realistic modelling of backpropagating action potentials
+% - other mechanisms involved in learning
+So far, FA has mainly been investigated at a network level,
+with less consideration to how individual neurons may implement
+the required learning mechanisms.
+\textcite{Guergiuev2017} is one exception;
+their work begins to address how feedforward and feedback signals
+may be managed within a single cell.
+Future work is needed to expand on these networks,
+for example by bringing in spiking dynamics.
+
+% Combining FA and NEF methods
+
+
+\subsection{Beyond}
+\scnlabel{future-beyond}
+% --- larger extensions
+
+There are a number of open questions that go beyond the methods examined in this thesis.
+
+% Dale's principle
+While this work makes a step in the direction of biological plausibility,
+there are still numerous characteristics of biological networks
+that are not accounted for by any object recognition models.
+One such characteristic is Dale's principle,
+which for our purposes can be simplified to the rule
+that neurons are either excitatory or inhibitory (in their output),
+not both.
+In typical ANNs, including all the networks developed in this thesis,
+neurons are allowed to have both positive and negative connection weights
+on their outputs.
+Respecting Dale's principle would require restricting these to be
+either all-positive or all-negative for each neuron,
+which could have significant effects on learning.
+Excitatory and inhibitory neurotransmitters also have different synaptic dynamics,
+and excitatory and inhibitory neurons have different connectivity structures;
+a more extensive implementation of Dale's principle
+would also account for these additional characteristics.
+
+% Localization of objects
+% Need for video? attention? neuromorphic methods will excel more
+% foveas?
+All the methods presented in this thesis process static images,
+one-at-a-time, and view each image in its entirety.
+This is the way object recognition systems
+have traditionally been designed and developed,
+and it is still common today.
+Recently, some researchers have begun focusing on object localization,
+where objects are both identified (recognized)
+and their position in the image is determined;
+this task is included as part of the new ImageNet challenges (ILSVRC).
+This allows images with multiple objects
+to be processed in a more natural manner.
+%% This idea of object localization also connects to attention
+
+A next step is to begin to run object recognition networks on video,
+and as part of this process,
+incorporate other aspects of vision such as tracking.
+%% Not only can this potentially impro
+I believe that it is in such systems,
+where there is a temporal aspect to the input,
+that neuromorphic hardware will really offer an advantage.
+No longer will the temporal aspect of spiking neurons
+be holding back the efficiency of the system,
+as occurs when a spiking network needs
+multiple timesteps to process a static image
+(whereas an ANN can process it in one forwards pass).
+With dynamic inputs, spiking networks will be continuously processing,
+which could allow for both efficient computation and short response times.
+Traditional methods like ANNs require a new,
+independent pass through the network for each video frame,
+potentially making them less efficient by comparison.
+
+% Role of unsupervised learning in visual system development
+% - need to use less labelled data, do more with what we have
+% - what does this suggest about NEF encoders? Encoder-selection methods
+%   like a form of unsupervised learning
+All methods that currently excel at object recognition---%
+including all the methods in this thesis---%
+rely heavily on supervised learning.
+They require large sets of labeled data,
+and while images are cheap, the corresponding labels are expensive,
+because they require a human to provide them.
+Not only is this detrimental from an engineering perspective,
+it also limits the biological plausibility of the models.
+Young humans learn to recognize objects using only limited labels.
+A child needs only to be told a few times that a particular type of animal
+is a dog or a cat,
+and can quickly begin generalizing to other objects of the same class.\footnote{
+  ANNs, by contrast, require thousands of labelled examples of each class.}
+%% (sometimes over-generalizing, and calling all animals ``puppy'' for example).
+This points to large amounts of unsupervised learning happening in the brain,
+specifically a type of clustering that allows us to group objects
+even when we do not have a label to apply to the group.
+
+Accounting for such unsupervised learning will
+significantly change the way we model object recognition.
+For the fixed-encoding methods of \chp{nef},
+ideas and methods from unsupervised learning
+can inform the way we choose encoders,
+so that they will better capture and separate the data.
+When learning deep networks with backpropagation (\chp{spike}),
+methods that combine unsupervised and supervised learning
+will ideally be able to learn better generalization,
+since they can take advantage of the large number of unsupervised images available.
+Finally, unsupervised learning will have a dramatic effect
+on the biological learning models discussed in \chp{learning}.
+It will take a lot of the onus off the supervised learning method (\eg/ Feedback Alignment),
+allowing the supervised methods to focus on learning the last few layers of the network,
+while the unsupervised methods take care of much of the earlier learning.
+This means that it is not as important if these supervised methods
+can learn very deep networks,
+and may mean that algorithms like Feedback Alignment
+that can only partially solve the credit assignment problem
+could still be successful in the brain.
+Unsupervised learning may also be important when there are no tied weights.
+Tied weights are relied upon heavily in machine learning
+through the use of convolutional networks,
+but are not possible in the brain where each connection is independent.
+
+Unsupervised learning is a specific example of the need for
+more complex objective functions in deep learning.
+While there are advantages to the simplicity of
+only having a performance-based objective function
+at the output layer of the network---%
+and it is amazing how much has been accomplished with this paradigm---%
+the brain likely uses many cost functions,
+and throughout the visual hierarchy, not just at the output.
+Cost functions in the early visual cortices likely contribute to many tasks,
+not only object recognition.
+Early visual neurons have many responsibilities,
+including edge detection, depth perception, and motion perception.
+Learning to be good at one of these responsibilities
+may help in other responsibilities as well.
+For example, image edges often co-occur with depth edges and
+the borders of motion,
+since all of these often correspond to the edges of physical objects.
+Thus, a cost function that pushes neurons to detect object edges
+will not only be training these neurons for a variety of tasks,
+but will also have a multitude of features with which to train them.
+Current object recognition networks are trained only with static images,
+and thus have no concept of depth or motion.
+To achieve human-level performance on real-world object recognition tasks
+with only limited labeled data,
+we may require systems that have many complex cost functions
+working together to use information from all aspects of the visual environment,
+including viewing \ddd/ objects in stereo,
+from numerous angles, under various lighting conditions,
+and with observer and object motion.
+This is the environment that gives rise to human vision.
+
+%%  LocalWords:  nef Toh GFA LFA DFA bp Krizhevsky Springenberg Diehl
+%%  LocalWords:  Zambrano Nokland bg Guergiuev ILSVRC sota

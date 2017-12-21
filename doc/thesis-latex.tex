@@ -1,0 +1,153 @@
+%% see eric_functions.sty for more ideas
+
+\usepackage[american]{babel}
+\usepackage{csquotes}  % recommended by biblatex?
+
+%% \usepackage[backend=biber,style=apa,maxcitenames=2]{biblatex}
+\usepackage[backend=biber,style=apa,maxcitenames=2,uniquename=false,uniquelist=false]{biblatex}
+%% \usepackage[style=authoryear,backend=biber]{biblatex}
+\DeclareLanguageMapping{american}{american-apa}
+\addbibresource{thesis.bib}
+%% \renewbibmacro{in:}{}% Remove ``In'' from all entries for authoryear
+%% \renewbibmacro{in:}{% Remove ``In'' from article entries
+%%   \ifentrytype{article}{}{\printtext{\bibstring{in}\intitlepunct}}}
+
+%% \usepackage{hyphenate}
+\hyphenation{supra-thresh-old di-cho-to-mies com-pu-ta-tion-al neu-ro-sci-ence}
+
+\usepackage{multirow}
+\usepackage{rotating}  % for sidewaystable
+
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{calc}
+
+%% \usepackage[titletoc,page]{appendix}
+%% \usepackage[page]{appendix}
+\usepackage[titletoc]{appendix}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% References
+\newcommand{\chplabel}[1]{\label{chp:#1}}
+\newcommand{\scnlabel}[1]{\label{scn:#1}}
+\newcommand{\applabel}[1]{\label{app:#1}}
+\newcommand{\eqnlabel}[1]{\label{eqn:#1}}
+\newcommand{\figlabel}[1]{\label{fig:#1}}
+\newcommand{\tablabel}[1]{\label{tab:#1}}
+\newcommand{\almlabel}[1]{\label{alm:#1}}
+
+\newcommand{\chpref}[1]{\ref{chp:#1}}
+\newcommand{\scnref}[1]{\ref{scn:#1}}
+\newcommand{\appref}[1]{\ref{app:#1}}
+\newcommand{\eqnref}[1]{\ref{eqn:#1}}
+\newcommand{\figref}[1]{\ref{fig:#1}}
+\newcommand{\tabref}[1]{\ref{tab:#1}}
+\newcommand{\almref}[1]{\ref{alm:#1}}
+
+\newcommand{\chp}[1]{Chapter~\chpref{#1}}
+\newcommand{\scn}[1]{Section~\scnref{#1}}
+\newcommand{\app}[1]{Appendix~\appref{#1}}
+\newcommand{\eqn}[1]{Equation~\eqnref{#1}}
+\newcommand{\fig}[1]{Figure~\figref{#1}}
+\newcommand{\tab}[1]{Table~\tabref{#1}}
+\newcommand{\alm}[1]{Algorithm~\almref{#1}}
+
+\newcommand{\dict}[2]{\emph{#1}\footnote{\makefirstuc{\textbf{#1}}: #2}}
+
+\newcommand{\captionb}[2]{\caption[#1]{\textbf{#1}#2}}
+
+\makeatletter
+\newcommand\footnoteref[1]{\protected@xdef\@thefnmark{\ref{#1}}\@footnotemark}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Text
+
+%% \newcommand{\super}[1]{\ensuremath{^{\textnormal{\scriptsize #1}}}}
+%% \newcommand{\sub}[1]{\ensuremath{_{\textnormal{\scriptsize #1}}}}
+\newcommand{\super}[1]{\ensuremath{^{\text{#1}}}}
+\newcommand{\sub}[1]{\ensuremath{_{\text{#1}}}}
+
+%%% Symbols
+\def\degree/{\ensuremath{^\circ}}
+\def\sth/{\super{th}}  % \th is already taken
+
+\def\ie/{i.e.,}
+\def\eg/{e.g.,}
+\def\cf/{cf.}
+\def\wrt/{w.r.t.}
+\def\aka/{a.k.a.}
+
+\def\dd/{\mbox{2-D}}  % the mbox keeps it all on one line
+\def\ddd/{\mbox{3-D}}  % the mbox keeps it all on one line
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Math
+
+%%% General
+\newcommand{\mathsymb}[2]{\newcommand{#1}{\ensuremath{#2}}}
+\newcommand{\mathtext}[2]{\newcommand{#1}{\ensuremath{\mathrm{#2}}}}
+
+\newcommand{\mathspace}{\hspace{0.4em}}
+\newcommand{\mathword}[1]{\mathrm{#1}\mathspace}
+
+%%% Units
+%\newcommand{\unit}[1]{\ensuremath{\hspace{0.3em}\mathtt{#1}}}
+\newcommand{\unit}[1]{\ensuremath{\hspace{0.25em}\mathrm{#1}}}
+
+%%% Functions
+\newcommand{\fn}[1]{\ensuremath{\mathrm{#1}}}
+
+\newcommand{\diff}[2]{\ensuremath{\frac{d#1}{d#2}}}
+\newcommand{\pdiff}[2]{\ensuremath{\frac{\partial #1}{\partial #2}}}
+\newcommand{\ppdiff}[2]{\ensuremath{\frac{\partial^2 #1}{\partial {#2}^2}}}
+
+\newcommand{\piecewise}[2]{\ensuremath{\left\{ \begin{array}{#1} #2 \end{array} \right. }}
+
+\newcommand{\mean}[1]{\ensuremath{\langle#1\rangle}}
+\newcommand{\mmean}[1]{\mean{\mean{#1}}}
+
+\DeclareMathOperator*{\argmin}{arg\,min}
+\DeclareMathOperator*{\argmax}{arg\,max}
+
+\newcommand{\diag}{\text{diag}}
+
+%%% Vectors
+\newcommand{\vect}[1]{\ensuremath{\boldsymbol{#1}}}
+%% \newcommand{\vect}[1]{\ensuremath{\underline{#1}}}
+
+%%% Matrices
+%% \newcommand{\mat}[1]{\ensuremath{\boldsymbol{\mathrm{#1}}}}
+\newcommand{\mat}[1]{\ensuremath{\mathrm{#1}}}
+\newcommand{\matel}[1]{\ensuremath{\mathrm{#1}}}
+\newcommand{\transpose}{\ensuremath{^{\mathrm{T}}}}
+
+\renewcommand{\matrix}[2]{\ensuremath{\left[ \begin{array}{#1} #2 \end{array} \right]}}
+
+%%% Symbols
+\newcommand{\by}{\ensuremath{\times}}
+\newcommand{\defin}{\triangleq} % use \triangleq or \equiv
+
+\newcommand{\di}{\partial}
+\newcommand{\del}{\nabla}
+\newcommand{\conv}{\ast}
+\newcommand{\cconv}{\circledast}
+
+%%% Classes
+\newcommand{\reals}{\mathbb{R}}
+\newcommand{\complexes}{\mathbb{C}}
+\newcommand{\integers}{\mathbb{Z}}
+\newcommand{\naturals}{\mathbb{N}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Variables
+
+\newcommand{\subsym}[3]{%
+    \newcommand{#1}{\ensuremath{{#2}_{\text{#3}}}}}
+
+\subsym{\taus}{\tau}{s}
+\subsym{\taurc}{\tau}{RC}
+\subsym{\tref}{t}{ref}
+
+\subsym{\Vth}{V}{th}
+\subsym{\Vrest}{V}{rest}

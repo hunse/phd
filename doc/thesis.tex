@@ -1,0 +1,157 @@
+% Specify the document class, default style attributes, and page dimensions
+% For hyperlinked PDF, suitable for viewing on a computer, use this:
+\documentclass[letterpaper,12pt,titlepage,oneside,final]{book}
+
+% For PDF, suitable for double-sided printing, change the PrintVersion variable below
+% to "true" and use this \documentclass line instead of the one above:
+%% \documentclass[letterpaper,12pt,titlepage,openright,twoside,final]{book}
+
+% This package allows if-then-else control structures.
+\usepackage{ifthen}
+\newboolean{PrintVersion}
+\setboolean{PrintVersion}{false}
+%% \setboolean{PrintVersion}{true}
+% CHANGE THIS VALUE TO "true" as necessary, to improve printed results for hard copies
+% by overriding some options of the hyperref package below.
+
+%\usepackage{nomencl} % For a nomenclature (optional; available from ctan.org)
+\usepackage{amsmath,amssymb,amstext} % Lots of math symbols and environments
+\usepackage[pdftex]{graphicx} % For including graphics N.B. pdftex graphics driver
+
+%% \usepackage{color}
+\usepackage{xcolor}
+\definecolor{darkred}{rgb}{0.5,0.,0.}
+\definecolor{darkgreen}{rgb}{0.,0.5,0.}
+\definecolor{darkblue}{rgb}{0.,0.,0.9}
+
+% include other packages and define custom commands
+\input{thesis-latex}
+
+% N.B. HYPERREF MUST BE THE LAST PACKAGE LOADED; ADD ADDITIONAL PKGS ABOVE
+%% \usepackage[pdftex,letterpaper=true,pagebackref=false]{hyperref} % with basic options
+		% N.B. pagebackref=true provides links back from the References to the body text. This can cause trouble for printing.
+\usepackage[pdftex,pagebackref=false,hyperfootnotes=false]{hyperref}
+\hypersetup{
+    plainpages=false,       % needed if Roman numbers in frontpages
+    %% pdfpagelabels=true,     % adds page number as label in Acrobat's page count
+    %% bookmarks=true,         % show bookmarks bar?
+    unicode=false,          % non-Latin characters in Acrobat’s bookmarks
+    pdftoolbar=true,        % show Acrobat’s toolbar?
+    pdfmenubar=true,        % show Acrobat’s menu?
+    pdffitwindow=false,     % window fit to page when opened
+    pdfstartview={FitH},    % fits the width of the page to the window
+    pdftitle={Spiking Deep Neural Networks},
+    %% pdftitle={Spiking Deep Neural Networks: Engineered and Biological Approaches to Object Recognition},
+    pdfauthor={Eric G Hunsberger},
+    pdfsubject={Biological object recognition models},
+    pdfkeywords={object recognition} {spiking neural networks} {learning},
+    pdfnewwindow=true,      % links in new window
+    colorlinks=true,        % false: boxed links; true: colored links
+    %% linkcolor=blue,         % color of internal links
+    linkcolor=darkblue,         % color of internal links
+    %% citecolor=green,        % color of links to bibliography
+    citecolor=darkgreen,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    %% urlcolor=cyan           % color of external links
+    urlcolor=darkred           % color of external links
+}
+\ifthenelse{\boolean{PrintVersion}}{
+  \hypersetup{
+%    colorlinks,%
+    citecolor=black,%
+    filecolor=black,%
+    linkcolor=black,%
+    urlcolor=black}
+}{}
+
+% Setting up the page margins...
+% uWaterloo thesis requirements specify a minimum of 1 inch (72pt) margin at the
+% top, bottom, and outside page edges and a 1.125 in. (81pt) gutter
+% margin (on binding side). While this is not an issue for electronic
+% viewing, a PDF may be printed, and so we have the same page layout for
+% both printed and electronic versions, we leave the gutter margin in.
+% Set margins to minimum permitted by uWaterloo thesis regulations:
+\setlength{\marginparwidth}{0pt} % width of margin notes
+% N.B. If margin notes are used, you must adjust \textwidth, \marginparwidth
+% and \marginparsep so that the space left between the margin notes and page
+% edge is less than 15 mm (0.6 in.)
+\setlength{\marginparsep}{0pt} % width of space between body text and margin notes
+\setlength{\evensidemargin}{0.125in} % Adds 1/8 in. to binding side of all
+% even-numbered pages when the "twoside" printing option is selected
+\setlength{\oddsidemargin}{0.125in} % Adds 1/8 in. to the left of all pages
+% when "oneside" printing is selected, and to the left of all odd-numbered
+% pages when "twoside" printing is selected
+\setlength{\textwidth}{6.375in} % assuming US letter paper (8.5 in. x 11 in.) and
+% side margins as above
+\raggedbottom
+
+% The following statement specifies the amount of space between
+% paragraphs. Other reasonable specifications are \bigskipamount and \smallskipamount.
+\setlength{\parskip}{\medskipamount}
+
+% The following statement controls the line spacing.  The default
+% spacing corresponds to good typographic conventions and only slight
+% changes (e.g., perhaps "1.2"), if any, should be made.
+\renewcommand{\baselinestretch}{1} % this is the default line space setting
+
+% By default, each chapter will start on a recto (right-hand side)
+% page.  We also force each section of the front pages to start on
+% a recto page by inserting \cleardoublepage commands.
+% In many cases, this will require that the verso page be
+% blank and, while it should be counted, a page number should not be
+% printed.  The following statements ensure a page number is not
+% printed on an otherwise blank verso page.
+\let\origdoublepage\cleardoublepage
+\newcommand{\clearemptydoublepage}{%
+  \clearpage{\pagestyle{empty}\origdoublepage}}
+\let\cleardoublepage\clearemptydoublepage
+
+\graphicspath{{../figures/}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+\input{thesis-frontpgs}
+\input{thesis-intro}
+\input{thesis-nef}
+\input{thesis-spike}
+\input{thesis-learning}
+\input{thesis-conclusion}
+\input{thesis-appendices}
+
+
+% B I B L I O G R A P H Y
+% -----------------------
+
+\cleardoublepage
+\phantomsection
+\renewcommand*{\bibname}{References}
+\addcontentsline{toc}{chapter}{\textbf{References}}
+\printbibliography
+
+
+%% % The following statement selects the style to use for references.  It controls the sort order of the entries in the bibliography and also the formatting for the in-text labels.
+%% %% \bibliographystyle{plain}
+%% \bibliographystyle{ieeetr}
+
+%% % This specifies the location of the file containing the bibliographic information.
+%% % It assumes you're using BibTeX (if not, why not?).
+%% \cleardoublepage % This is needed if the book class is used, to place the anchor in the correct page,
+%%                  % because the bibliography will start on its own page.
+%%                  % Use \clearpage instead if the document class uses the "oneside" argument
+%% \phantomsection  % With hyperref package, enables hyperlinking from the table of contents to bibliography
+%% % The following statement causes the title "References" to be used for the bibliography section:
+%% \renewcommand*{\bibname}{References}
+
+%% % Add the References to the Table of Contents
+%% \addcontentsline{toc}{chapter}{\textbf{References}}
+
+%% \bibliography{/media/dropbox/papers/bib/library}
+%% % Tip 5: You can create multiple .bib files to organize your references.
+%% % Just list them all in the \bibliogaphy command, separated by commas (no spaces).
+
+%% % The following statement causes the specified references to be added to the bibliography% even if they were not
+%% % cited in the text. The asterisk is a wildcard that causes all entries in the bibliographic database to be included (optional).
+%% %% \nocite{*}
+
+\end{document}

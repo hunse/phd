@@ -1,0 +1,57 @@
+\tikzstyle{line} = [draw]
+
+\begin{tabular}{c|c|c}
+  BP & FA & My model \\
+\begin{tikzpicture}[->,>=stealth',auto,node distance=1.2cm,
+    thick,circnode/.style={circle,draw,inner sep=2}]
+  \node[circnode] (h) {$h$};
+  \node[circnode] (d) [right of=h, node distance=2cm] {$\delta$};
+  \node[] (ah) [above of=h] {};
+  \node[] (bh) [below of=h] {};
+  \path[line] (bh) -- node [right] (W) {$W$} (h);
+  \path[line] (h) -- (ah);
+  \node[] (ad) [above of=d] {};
+  \node[] (bd) [below of=d] {};
+  \path[line] (ad) -- (d);
+  \path[line] (d) -- node [right] {$W^T$} (bd);
+  \path[line] (h) to [out=45,in=135] node {$h'$} (d);
+  \path[line] (d) to (W);
+\end{tikzpicture}
+&
+\begin{tikzpicture}[->,>=stealth',auto,node distance=1.2cm,
+    thick,circnode/.style={circle,draw,inner sep=2}]
+  \node[circnode] (h) {$h$};
+  \node[circnode] (d) [right of=h, node distance=2cm] {$\delta$};
+  \node[] (ah) [above of=h] {};
+  \node[] (bh) [below of=h] {};
+  \path[line] (bh) -- node [right] (W) {$W$} (h);
+  \path[line] (h) -- (ah);
+  \node[] (ad) [above of=d] {};
+  \node[] (bd) [below of=d] {};
+  \path[line] (ad) -- (d);
+  \path[line] (d) -- node [right] {$B$} (bd);
+  %% \path[line] (h.north) to [out=45,in=45] node {$h'$} (W);
+  \path[line] (h.north) .. controls +(right:5mm) and +(up:5mm)
+                        .. node {$h'$} (W.north east);
+  \path[line] (d) to (W);
+\end{tikzpicture}
+&
+\begin{tikzpicture}[->,>=stealth',auto,node distance=1.2cm,
+    thick,circnode/.style={circle,draw,inner sep=2}]
+  \node[circnode] (h) {$h$};
+  \node[circnode] (d) [right of=h, node distance=2cm] {$e$};
+  \node[] (ah) [above of=h] {};
+  \node[] (bh) [below of=h] {};
+  \path[line] (bh) -- node [right] (W) {$W$} (h);
+  \path[line] (h) -- (ah);
+  \node[] (ad) [above of=d] {};
+  \node[] (bd) [below of=d] {};
+  \path[line] (ad) -- (d);
+  \path[line] (d) -- (bd);
+  %% \path[line] (h.north east) to [out=45,in=45] node {$h'$} (W);
+  \path[line] (h.north) .. controls +(right:5mm) and +(up:5mm)
+                        .. node {$h'$} (W.north east);
+  \path[line] (d) to node [below] {$B$} (W);
+\end{tikzpicture}
+
+\end{tabular}

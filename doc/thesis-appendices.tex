@@ -1,0 +1,265 @@
+\begin{appendices}
+
+\chapter{Efficient Weighted Linear Least Squares for Classification}
+\applabel{wlls}
+
+Weighted squared loss (\aka/ weighted linear least-squares)
+can be used to solve for decoding weights
+in fixed-encoding networks (\scn{wsquaredloss}),
+performing better than unweighted linear least-squares (\scn{dec-results}).
+When solving these systems for classification,
+particular constraints on the weights
+allow us to solve the problem almost as quickly as unweighted least squares.
+
+Let $\mat A$ be an $M \times N$ matrix of activities of $N$ hidden neurons
+on $M$ training examples.
+Let $\mat Y$ be an $M \times D$ matrix of the one-hot classification targets
+for the $D$ possible classes.
+Let $\mat X$ be an $N \times D$ matrix of the decoding weights,
+which we wish to solve for.
+%% Let $\mat W_k$ be one of a set of $D$ matrices, each $N \times N$ and diagonal,
+
+In unweighted linear least-squares, we solve the equation
+\begin{align}
+  (\mat A^T \mat A + \lambda\mat I) \mat X = \mat A^T \mat Y.
+\end{align}
+Note that we are solving for the $D$ columns of $\mat X$,
+but since each column obeys the same system of equations
+$\mat A^T \mat A + \lambda\mat I$,
+if we use direct (\ie/ non-iterative) methods,
+we pay essentially the same computational cost as solving a one-dimensional system.
+
+In weighted linear least-squares, we solve the equation
+\begin{align}
+  (\mat A^T \mat W \mat A + \lambda\mat I) \mat X = \mat A^T \mat W \mat Y.
+\end{align}
+However, since we want different weights for each column of $\mat X$ and $\mat Y$,
+we must solve a set of $k \in [0, D)$ one-dimensional systems:
+\begin{align}
+  (\mat A^T \mat W_k \mat A + \lambda\mat I) \vect X_k = \mat A^T \mat W_k \vect Y_k,
+  \eqnlabel{weighted-lstsq-systems}
+\end{align}
+where $\mat X_k$ and $\mat Y_k$ are the $k$\sth/ columns of $\mat X$ and $\mat Y$, respectively,
+and $\mat W_k$ is an $M \times M$ diagonal matrix of weights for the $k$\sth/ system.
+This system is much more expensive to solve, because we must compute $D$
+products $\mat A^T \mat W_k \mat A$, with a total computational complexity of $O(DMN^2)$.
+
+To reduce the cost, we will take advantage of the fact that the weights
+on each example are $(W_k)_{ii} = w_k^+$ if $Y_{ik} = 1$,
+and $(W_k)_{ii} = w_k^-$ if $Y_{ik} = 0$.
+
+Let $\mat A_k$ be the rows of $\mat A$ that belong to class $k$
+(\ie/ each row $(A_k)_i$ such that $Y_{ik} = 1$),
+and $\mat A_{\bar k}$ be the rows of $\mat A$ that do not belong to class $k$.
+We can then write \eqn{weighted-lstsq-systems} as
+\begin{align}
+  (w_k^+ \mat A_k^T \mat A_k + w_k^- \mat A_{\bar k}^T \mat A_{\bar k} + \lambda\mat I) \vect X_k
+    &= w_k^+ \mat A_k^T \mathfrak{1}_{M_k} \\
+  ((w_k^+ - w_k^-) \mat A_k^T \mat A_k + \mat A^T \mat A + \lambda\mat I) \vect X_k
+    &= w_k^+ \mat A_k^T \mathfrak{1}_{M_k}
+\end{align}
+where $\mathfrak{1}_{M_k}$ is a vector of ones of length $M_k$.
+Since $\mat A^T \mat A = \sum_k \mat A_k^T \mat A_k$,
+we now only have to compute the $D$ matrix products $\mat A_k^T \mat A_k$
+(with a total computational complexity of $O(MN^2)$),
+rather than having to compute the the $D$ matrix products $\mat A^T \mat W_k \mat A$
+(with a total computational complexity of $O(DMN^2)$).
+When $M > DN$, computing these matrix products is the main computational burden
+of the algorithm;
+solving an $N$-dimensional linear system has complexity $O(N^3)$.
+Thus, in many cases, the weighted linear least-squares algorithm
+does not take much longer than unweighted linear least-squares.
+
+
+\chapter{Derivations of Filtered Spike Train Equations}
+\applabel{spike-derivations}
+
+By modelling the variability of a filtered spike trains (\scn{noise-models}),
+we can train networks using noise that simulates this variability,
+and thereby make networks more robust to it (\scn{spike-noise-results}).
+To model spiking variability,
+we look at the effect of various synaptic filters
+on the spikes coming out of a neuron firing at a constant rate.
+
+The output spikes of a neuron firing at a constant rate
+can be modelled as an impulse train:
+\begin{align}
+  T(t) = \sum\limits_{i=-\infty}^{\infty} \delta(t + ip)
+\end{align}
+where $p$ is the period between spikes,
+and $\delta(\cdot)$ is the Dirac delta (\aka/ impulse) function.
+
+Convolving this impulse train with a filter
+will produce a copy of the impulse response of the filter at each spike.
+The filtered spike train $s(t)$ is then given by
+the sum of the contributions of all previous filtered spikes:
+\begin{align}
+  s(t) = \sum\limits_{i=0}^\infty h(t + ip)
+  \eqnlabel{filteredspikes}
+\end{align}
+for $0 \le t < p$,
+where $h(\cdot)$ is the impulse response of the filter.
+
+
+\section{Exponential synapse response}
+
+First, we examine the filtered spike train
+when the synapse is a first-order synapse model: the exponential model.
+The impulse response of an exponential filter is given by
+\begin{align}
+  h_1(t) = \frac{1}{\taus} e^{-t / \taus}
+\end{align}
+where $\taus$ is the synaptic time constant.
+Substituting this into \eqn{filteredspikes} we get:
+\begin{align}
+  s_1(t) &= \sum\limits_{i=0}^\infty \frac{1}{\taus} e^{-(t + ip) / \taus} \\
+         &= \sum\limits_{i=0}^\infty \frac{1}{\taus} e^{-t/\taus} e^{-ip/\taus}
+\end{align}
+We are summing over a geometric series of the form
+\begin{align}
+  \sum\limits_{i=0}^\infty a r^i = a / (1 - r)
+  \eqnlabel{geometric}
+\end{align}
+where $a = e^{-t/\taus} / \taus$ and $r = e^{-p/\taus}$.
+As long as $p > 0$, then $r < 1$ and the series converges,
+resulting in the following sum:
+\begin{align}
+  s_1(t) &= \frac{e^{-t/\taus}}{\taus \left(1 - e^{-p/\taus}\right)} \text{ .}
+  \eqnlabel{lowpass-series}
+\end{align}
+
+
+\section{Alpha synapse response}
+
+Next, we examine the filtered spike train
+when the synapse is a common second-order synapse model: the alpha synapse model.
+The impulse response of an alpha filter is given by
+\begin{align}
+  h_2(t) = \frac{t}{\taus^2} e^{-t / \taus}
+\end{align}
+where $\taus$ is the synaptic time constant.
+Substituting this into \eqn{filteredspikes} we get:
+\begin{align}
+  s_2(t) &= \sum\limits_{i=0}^\infty \frac{(t + ip)}{\taus^2} e^{-(t + ip) / \taus} \\
+         &= \sum\limits_{i=0}^\infty \frac{1}{\taus^2} e^{-t/\taus} (t + ip) e^{-ip/\taus}
+\end{align}
+This is an arithmetico-geometric series of the form
+\begin{align}
+  \sum\limits_{i=0}^\infty c (a + ib) r^i
+  = c\left( \frac{a}{1 - r} + \frac{br}{(1 - r)^2} \right)
+  \eqnlabel{arithmetico-geometric}
+\end{align}
+where $a = t$, $b = p$, $c = e^{-t / \taus} / \taus^2$, and $r = e^{-p / \taus}$.
+This results in the following sum:
+\begin{align}
+  s_2(t) &= \frac{e^{-t/\taus}}{\taus^2} \left(
+    \frac{t}{1 - e^{-p/\taus}} + \frac{p e^{-p/\taus}}{\left(1 - e^{-p/\taus}\right)^2} \right) \text{ .}
+  \eqnlabel{alpha-series}
+\end{align}
+
+
+\section{Combined alpha synapse and membrane response}
+
+Finally, we look at the filtered spike train under
+combined filtering from an alpha synapse and first-order model of the neuron membrane.
+The combined alpha filter and neuron membrane filter
+has a transfer function of
+\begin{align}
+  H_3(s) = \frac{1}{(\taus s + 1)^2 (\taurc s + 1)}
+\end{align}
+Assuming $\taurc \neq \taus$ (as is typically the case),
+this results in an impulse response of
+\begin{align}
+  h_3(t) = \frac{\taurc}{d^2} \left(e^{-t/\taurc} - e^{-t/\taus}\right)
+    - \frac{t}{\taus d} e^{-t/\taus}
+\end{align}
+where $d = \taurc - \taus$.
+As before, we substitute into \eqn{filteredspikes},
+and find the value of the infinite series
+using the equations for the geometric and arithmetico-geometric series,
+resulting in:
+\begin{align}
+  s_3(t) &= \frac{\taurc}{d^2}\left(
+    \frac{e^{-t/\taurc}}{1 - e^{-p/\taurc}} - \frac{e^{-t/\taus}}{1 - e^{-p/\taus}}\right)
+  - \frac{e^{-t/\taus} \left(t (1 - e^{-p/\taus}) + p e^{-p/\taus}\right)}
+         {d \taus \left(1 - e^{-p/\taus}\right)^2} \text{ .}
+  \eqnlabel{alpharc-series}
+\end{align}
+
+
+\section{Limits of synapse responses}
+\applabel{spike-model-limits}
+
+To determine the variance of the
+exponential synapse response ($s_1$, \eqn{lowpass-series}) and
+alpha synapse response ($s_2$, \eqn{alpha-series}),
+we look at the limit of the maximum value minus the minimum value
+as the period $p \to \infty$.
+
+For the exponential synapse, the maximum value occurs at $t = 0$,
+and the minimum at $t = p$.
+The range of the series is then:
+\newcommand{\zp}{e^{-p/\taus}}
+\newcommand{\zpa}{1 - \zp}
+\newcommand{\zpb}{\left(\zpa\right)}
+\newcommand{\zt}{\exp{-t/\taus}}
+\begin{align}
+  & s_1(t = 0) - s_1(t = p) \\
+  &= \frac{1}{\taus\zpb} - \frac{\zp}{\zpb} \\
+  &= \frac{\zpa}{\taus\zpb} \\
+  &= \frac{1}{\taus} \text{ .}
+\end{align}
+Since this is constant (independent of $p$),
+the range of this function will be large even for very high firing rates (small $p$),
+resulting in significant variance in the filtered neural output.
+
+For the alpha synapse, the maximum occurs when
+the derivative of the series function $s_2$ equals zero:
+\newcommand{\tstar}{t_*}
+\begin{align}
+  0 &= \pdiff{}{t} \frac{t\zpb\zt + p\zp\zt}{\taus^2\zpb^2} \\
+  0 &= \frac{(1 - \frac{t}{\taus})\zpb\zt - \frac{zp}{\taus}\zt}{\taus^2\zpb^2} \\
+  0 &= (1 - \frac{t}{\taus})\zpb - \frac{p\zp}{\taus} \\
+  \tstar &= \frac{\taus\zpb - p\zp}{\zpa} \text{ .}
+\end{align}
+The minimum of the series occurs when $t = p$
+(or $t = 0$, since this series is continuous and periodic with period $p$).
+Taking the limit of the difference:
+\begin{align}
+  & \lim_{p \to 0} s_2(t=\tstar) - s_2(t=p) \\
+  &= \lim_{p \to 0}
+   \frac{e^{-\tstar/\taus}\left(\taus\zpb - p\zp + p\zp\right)}{\taus^2\zpb^2}
+   - \frac{p\zp}{\taus^2\zpb^2} \\
+  &= \lim_{p \to 0} \frac{\taus e^{-\tstar/\taus}\zpb - p\zp}{\tau^2\zpb} \\
+  &= 0 \text{ .}
+\end{align}
+Thus, as the firing rate becomes large,
+the variance in the $alpha$-filtered spike train goes to zero.
+The intuition behind this is that the series $s_2(t)$ is continuous---%
+that is $s_2(0) = s_2(p)$---%
+so as the firing rate becomes large we are summing together more and more
+superimposed alpha function impulse responses,
+eventually resulting a constant signal.
+The exponentially-filtered series $s_1$ is discontinuous---
+namely $s_1(0) \ne s_1(p)$---%
+so even when filtering high-frequency spike trains
+we end up with a signal more similar to a sawtooth wave than a constant signal,
+resulting in non-zero variance in the limit as $p \to \infty$.
+
+
+\chapter{Source Code}
+\applabel{source}
+
+The source code used to generate all figures, tables, and results
+presented in this thesis is available online at
+\url{https://github.com/hunse/phd}.
+
+The source code for training and running the deep spiking networks
+presented in \chp{spike} is available at
+\url{https://github.com/hunse/cuda-convnet2}.
+
+
+\end{appendices}
+
+%%  LocalWords:  wlls wsquaredloss dec lstsq DMN ik DN ip arithmetico
+%%  LocalWords:  filteredspikes ib br alpharc zp
